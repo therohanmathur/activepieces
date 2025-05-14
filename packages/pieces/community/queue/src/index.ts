@@ -2,6 +2,7 @@ import { createPiece, PieceAuth } from "@activepieces/pieces-framework";
 import { pushToQueue } from "./lib/actions/push-to-queue";
 import { pullFromQueue } from "./lib/actions/pull-from-queue";
 import { clearQueue } from "./lib/actions/clear-queue";
+import { pushRecordsToQueue } from "./lib/actions/push-records-to-queue";
 
 export const queue = createPiece({
   displayName: "Queue",
@@ -10,6 +11,6 @@ export const queue = createPiece({
   minimumSupportedRelease: '0.30.0',
   logoUrl: 'https://cdn.activepieces.com/pieces/queue.svg',
   authors: ['AbdullahBitar'],
-  actions: [pushToQueue, pullFromQueue, clearQueue],
+  actions: [pushToQueue, pullFromQueue, clearQueue, pushRecordsToQueue],
   triggers: [],
 });
