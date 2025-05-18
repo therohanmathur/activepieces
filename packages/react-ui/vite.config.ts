@@ -24,13 +24,15 @@ export default defineConfig({
       },
     },
     port: 4200,
-    host: '0.0.0.0',
+    host: '0.0.0.0',  // Allow connections from any IP address
+    allowedHosts: ['studio.icustomer.ai', 'localhost', '127.0.0.1'],  // Allow your custom domain and localhost
   },
 
   preview: {
     port: 4300,
     host: 'localhost',
   },
+
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -84,3 +86,4 @@ export default defineConfig({
     },
   },
 });
+

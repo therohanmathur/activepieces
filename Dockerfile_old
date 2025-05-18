@@ -1,0 +1,43 @@
+FROM node:18.20.5-bullseye-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssh-client \
+    python3 \
+    g++ \
+    build-essential \
+    git \
+    poppler-utils \
+    poppler-data \
+    locales \
+    locales-all \
+    libcap-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# Set the locale
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+ENV NX_DAEMON=false
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package files and install all dependencies
+COPY package*.json ./
+COPY .npmrc ./
+RUN npm install -g npm@9.9.3 pnpm@9.15.0
+RUN npm install
+
+# Copy the rest of the project
+COPY . .
+
+# Install Husky hooks
+RUN npm run prepare
+
+# Expose frontend port
+EXPOSE 4200
+
+# Start all services (frontend on port 4200)
+CMD ["npm", "start"]
+
