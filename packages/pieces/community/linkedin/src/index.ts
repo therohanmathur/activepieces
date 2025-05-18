@@ -15,19 +15,12 @@ export const linkedinAuth = PieceAuth.OAuth2({
   tokenUrl: 'https://www.linkedin.com/oauth/v2/accessToken',
   required: true,
   scope: [
-    'openid',
-    'profile',
-    'r_ads_reporting',
-    'r_organization_social',
-    'rw_organization_admin',
     'w_member_social',
-    'r_ads',
     'w_organization_social',
-    'rw_ads',
-    'r_basicprofile',
-    'r_organization_admin',
+    'rw_organization_admin',
+    'openid',
     'email',
-    'r_1st_connections_size',
+    'profile',
   ],
 });
 
