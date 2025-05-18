@@ -1,5 +1,4 @@
-
-import { OAuth2GrantType } from '@activepieces/shared';
+import { OAuth2GrantType } from './oauth2-grant-type';
 import { Type } from '@sinclair/typebox';
 import { ShortTextProperty } from '../input/text-property';
 import { SecretTextProperty } from './secret-text-property';

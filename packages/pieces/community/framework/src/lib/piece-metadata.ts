@@ -3,7 +3,8 @@ import { WebhookRenewConfiguration, TriggerStrategy } from "./trigger/trigger";
 import { ErrorHandlingOptionsParam } from "./action/action";
 import { PieceAuthProperty } from "./property/authentication";
 import { Static, Type } from "@sinclair/typebox";
-import { LocalesEnum, PackageType, PieceCategory, PieceType, ProjectId, TriggerTestStrategy, WebhookHandshakeConfiguration } from "@activepieces/shared";
+import { LocalesEnum, PackageType, PieceType, ProjectId, TriggerTestStrategy, WebhookHandshakeConfiguration, WebhookHandshakeConfigurationType } from "./piece-metadata-types";
+import { PieceCategory } from "./piece";
 
 const I18nForPiece =  Type.Optional(Type.Partial(Type.Record(Type.Enum(LocalesEnum), Type.Record(Type.String(), Type.String()))));
 export type I18nForPiece = Static<typeof I18nForPiece>
@@ -67,7 +68,7 @@ export const TriggerBase = Type.Composite([
   Type.Object({
     type: Type.Enum(TriggerStrategy),
     sampleData: Type.Unknown(),
-    handshakeConfiguration: Type.Optional(WebhookHandshakeConfiguration),
+    handshakeConfiguration: Type.Optional(WebhookHandshakeConfigurationType),
     renewConfiguration: Type.Optional(WebhookRenewConfiguration),
     testStrategy: Type.Enum(TriggerTestStrategy),
   })

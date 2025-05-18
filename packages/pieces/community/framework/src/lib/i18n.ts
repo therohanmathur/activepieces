@@ -1,8 +1,8 @@
 import { I18nForPiece, PieceMetadataModel, PieceMetadataModelSummary } from "./piece-metadata"
-import { LocalesEnum } from "@activepieces/shared"
+import { LocalesEnum } from "./piece-metadata-types"
 import path from 'path';
 import fs from 'fs/promises';
-import keys from '../../translation-keys.json'
+const keys: string[] = require('../../translation-keys.json');
 
 function translateProperty(object: Record<string, unknown>, path: string, i18n: Record<string, string>) {
   const parsedKeys = path.split('.');
@@ -99,7 +99,7 @@ const translatePiece = <T extends PieceMetadataModelSummary | PieceMetadataModel
       return piece
     }
     const translatedPiece: T = JSON.parse(JSON.stringify(piece))
-    keys.forEach(key => {
+    keys.forEach((key: string) => {
       translateProperty(translatedPiece, key, target)
     })
     return translatedPiece

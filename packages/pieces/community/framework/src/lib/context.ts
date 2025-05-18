@@ -1,14 +1,4 @@
-import {
-  AppConnectionValue,
-  ExecutionType,
-  FlowRunId,
-  PopulatedFlow,
-  ProjectId,
-  RespondResponse,
-  ResumePayload,
-  SeekPage,
-  TriggerPayload,
-} from '@activepieces/shared';
+import { Static, Type } from '@sinclair/typebox';
 import { TriggerStrategy } from './trigger/trigger';
 import {
   InputPropertyMap,
@@ -16,7 +6,38 @@ import {
   StaticPropsValue,
 } from './property';
 import { PieceAuthProperty } from './property/authentication';
-import { DelayPauseMetadata, PauseMetadata, WebhookPauseMetadata } from '@activepieces/shared';
+
+export type AppConnectionValue = Record<string, unknown> | string | null;
+
+export enum ExecutionType {
+    BEGIN = 'BEGIN',
+    RESUME = 'RESUME',
+}
+
+export type FlowRunId = string;
+export type ProjectId = string;
+
+export type TriggerPayload = Record<string, unknown>;
+
+export type RespondResponse = {
+    status: number;
+    body?: unknown;
+    headers?: Record<string, string>;
+};
+
+export type ResumePayload = TriggerPayload;
+
+export type PopulatedFlow = {
+    id: string;
+    version: {
+        id: string;
+    };
+};
+
+export type SeekPage<T> = {
+    data: T[];
+    next?: string;
+};
 
 type BaseContext<
   PieceAuth extends PieceAuthProperty,
@@ -116,8 +137,6 @@ export type FlowsContext = {
   };
 }
 
-
-
 export type PropertyContext = {
   server: ServerContext;
   project: {
@@ -216,3 +235,36 @@ export enum StoreScope {
   PROJECT = 'COLLECTION',
   FLOW = 'FLOW',
 }
+
+export enum PauseType {
+    DELAY = 'DELAY',
+    WEBHOOK = 'WEBHOOK',
+}
+
+export enum ProgressUpdateType {
+    NONE = 'NONE',
+    WEBHOOK_RESPONSE = 'WEBHOOK_RESPONSE',
+    TEST_FLOW = 'TEST_FLOW',
+}
+
+export const DelayPauseMetadata = Type.Object({
+    type: Type.Literal(PauseType.DELAY),
+    resumeDateTime: Type.String(),
+    handlerId: Type.Optional(Type.String({})),
+    progressUpdateType: Type.Optional(Type.Enum(ProgressUpdateType)),
+});
+
+export type DelayPauseMetadata = Static<typeof DelayPauseMetadata>;
+
+export const WebhookPauseMetadata = Type.Object({
+    type: Type.Literal(PauseType.WEBHOOK),
+    requestId: Type.String(),
+    response: Type.Record(Type.String(), Type.Any()),
+    handlerId: Type.Optional(Type.String({})),
+    progressUpdateType: Type.Optional(Type.Enum(ProgressUpdateType)),
+});
+
+export type WebhookPauseMetadata = Static<typeof WebhookPauseMetadata>;
+
+export const PauseMetadata = Type.Union([DelayPauseMetadata, WebhookPauseMetadata]);
+export type PauseMetadata = Static<typeof PauseMetadata>;

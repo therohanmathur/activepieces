@@ -522,6 +522,9 @@
       "@activepieces/piece-netsuite": [
         "packages/pieces/community/netsuite/src/index.ts"
       ],
+      "@activepieces/piece-new-queue": [
+        "packages/pieces/community/new-queue/src/index.ts"
+      ],
       "@activepieces/piece-nifty": [
         "packages/pieces/community/nifty/src/index.ts"
       ],

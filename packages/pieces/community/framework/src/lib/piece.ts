@@ -1,13 +1,44 @@
 import { Trigger } from './trigger/trigger';
 import { Action } from './action/action';
-import {
-  EventPayload,
-  ParseEventResponse,
-  PieceCategory,
-} from '@activepieces/shared';
 import { PieceBase, PieceMetadata} from './piece-metadata';
 import { PieceAuthProperty } from './property/authentication';
 
+export type EventPayload = {
+    body: unknown;
+    rawBody?: unknown;
+    method: string;
+    headers: Record<string, string>;
+    queryParams: Record<string, string>;
+};
+
+export type ParseEventResponse = {
+    event?: string;
+    identifierValue?: string;
+    reply?: {
+        headers: Record<string, string>;
+        body: unknown;
+    };
+};
+
+export enum PieceCategory {
+    ARTIFICIAL_INTELLIGENCE = 'ARTIFICIAL_INTELLIGENCE',
+    COMMUNICATION = 'COMMUNICATION',
+    COMMERCE = 'COMMERCE',
+    CORE = 'CORE',
+    UNIVERSAL_AI = 'UNIVERSAL_AI',
+    FLOW_CONTROL = 'FLOW_CONTROL',
+    BUSINESS_INTELLIGENCE = 'BUSINESS_INTELLIGENCE',
+    ACCOUNTING = 'ACCOUNTING',
+    PRODUCTIVITY = 'PRODUCTIVITY',
+    CONTENT_AND_FILES = 'CONTENT_AND_FILES',
+    DEVELOPER_TOOLS = 'DEVELOPER_TOOLS',
+    CUSTOMER_SUPPORT = 'CUSTOMER_SUPPORT',
+    FORMS_AND_SURVEYS = 'FORMS_AND_SURVEYS',
+    HUMAN_RESOURCES = 'HUMAN_RESOURCES',
+    PAYMENT_PROCESSING = 'PAYMENT_PROCESSING',
+    MARKETING = 'MARKETING',
+    SALES_AND_CRM = 'SALES_AND_CRM',
+}
 
 export class Piece<PieceAuth extends PieceAuthProperty = PieceAuthProperty>
   implements Omit<PieceBase, 'version' | 'name'>
@@ -31,7 +62,6 @@ export class Piece<PieceAuth extends PieceAuthProperty = PieceAuthProperty>
     actions.forEach((action) => (this._actions[action.name] = action));
     triggers.forEach((trigger) => (this._triggers[trigger.name] = trigger));
   }
-
 
   metadata(): BackwardCompatiblePieceMetadata {
     return {
