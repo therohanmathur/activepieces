@@ -2,7 +2,9 @@ import { I18nForPiece, PieceMetadataModel, PieceMetadataModelSummary } from "./p
 import { LocalesEnum } from "./piece-metadata-types"
 import path from 'path';
 import fs from 'fs/promises';
-const keys: string[] = require('../../translation-keys.json');
+import translationKeys from '../../translation-keys.json';
+
+const keys: string[] = translationKeys;
 
 function translateProperty(object: Record<string, unknown>, path: string, i18n: Record<string, string>) {
   const parsedKeys = path.split('.');
