@@ -1,10 +1,10 @@
 import { PieceMetadata, 
     PieceMetadataModel,
-    PieceMetadataModelSummary } from '@activepieces/pieces-framework'
+    PieceMetadataModelSummary,
+    LocalesEnum } from '@activepieces/pieces-framework'
 import {
     ApEdition,
     ListVersionsResponse,
-    LocalesEnum,
     PackageType,
     PieceCategory,
     PieceOrderBy,

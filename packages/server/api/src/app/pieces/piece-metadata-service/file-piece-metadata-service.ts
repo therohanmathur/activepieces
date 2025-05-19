@@ -1,5 +1,4 @@
-
-import { PieceMetadata, PieceMetadataModel, PieceMetadataModelSummary, pieceTranslation } from '@activepieces/pieces-framework'
+import { PieceMetadata, PieceMetadataModel, PieceMetadataModelSummary, pieceTranslation, LocalesEnum } from '@activepieces/pieces-framework'
 import { AppSystemProp, filePiecesUtils } from '@activepieces/server-shared'
 
 import {

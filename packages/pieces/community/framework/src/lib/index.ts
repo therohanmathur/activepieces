@@ -6,3 +6,4 @@ export * from './piece';
 export * from './piece-metadata';
 export * from './validators/index'
 export * from './i18n'
+export { LocalesEnum, PackageType, PieceType, TriggerTestStrategy, WebhookHandshakeConfiguration, WebhookHandshakeConfigurationType } from './piece-metadata-types'

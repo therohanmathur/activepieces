@@ -1,4 +1,4 @@
-import { PieceMetadataModel  } from '@activepieces/pieces-framework'
+import { PieceMetadataModel, LocalesEnum } from '@activepieces/pieces-framework'
 import { apVersionUtil, UserInteractionJobType } from '@activepieces/server-shared'
 import {
     ALL_PRINCIPAL_TYPES,
@@ -10,7 +10,6 @@ import {
     ListPiecesRequestQuery,
     ListVersionRequestQuery,
     ListVersionsResponse,
-    LocalesEnum,
     PieceCategory,
     PieceOptionRequest,
     PrincipalType,
