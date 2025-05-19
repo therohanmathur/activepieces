@@ -50,7 +50,6 @@ COPY . .
 # Build backend, frontend and pieces
 RUN npx nx run-many --target=build --projects=server-api --configuration production --skip-nx-cache
 RUN npx nx run-many --target=build --projects=react-ui --skip-nx-cache
-RUN npx nx run-many --target=build --projects=pieces --skip-nx-cache
 
 # Install production dependencies for backend
 RUN cd dist/packages/server/api && npm install --production --force
@@ -76,13 +75,12 @@ COPY packages/server/api/src/assets/default.cf /usr/local/etc/isolate
 COPY --from=build /usr/src/app/LICENSE .
 
 # Create target folders
-RUN mkdir -p /usr/src/app/dist/packages/{server,engine,shared,pieces}
+RUN mkdir -p /usr/src/app/dist/packages/{server,engine,shared}
 
 # Copy built backend, frontend and pieces from build stage
 COPY --from=build /usr/src/app/dist/packages/engine/ /usr/src/app/dist/packages/engine/
 COPY --from=build /usr/src/app/dist/packages/server/ /usr/src/app/dist/packages/server/
 COPY --from=build /usr/src/app/dist/packages/shared/ /usr/src/app/dist/packages/shared/
-COPY --from=build /usr/src/app/dist/packages/pieces/ /usr/src/app/dist/packages/pieces/
 
 # Install backend production dependencies again (to be safe in run image)
 RUN cd /usr/src/app/dist/packages/server/api/ && npm install --production --force
