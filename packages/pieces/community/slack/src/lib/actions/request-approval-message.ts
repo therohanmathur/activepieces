@@ -93,8 +93,14 @@ export const requestSendApprovalMessageAction = createAction({
         approved: false, // default approval is false
       };
     } else {
+      const queryParams = context.resumePayload.queryParams;
+      if (typeof queryParams === 'object' && queryParams !== null && 'action' in queryParams) {
+        return {
+          approved: queryParams['action'] === 'approve',
+        };
+      }
       return {
-        approved: context.resumePayload.queryParams['action'] === 'approve',
+        approved: false,
       };
     }
   },

@@ -215,7 +215,7 @@ function createStopHook(params: CreateStopHookParams): StopHook {
         params.hookResponse = {
             ...params.hookResponse,
             type: 'stopped',
-            response: req ?? { response: {} },
+            response: req ?? { response: { status: 200 } },
         }
     }
 }
@@ -228,7 +228,7 @@ function createRespondHook(params: CreateRespondHookParams): RespondHook {
         params.hookResponse = {
             ...params.hookResponse,
             type: 'respond',
-            response: req ?? { response: {} },
+            response: req ?? { response: { status: 200 } },
         }
     }
 }

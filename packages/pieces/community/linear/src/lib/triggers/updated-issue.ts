@@ -80,7 +80,7 @@ export const linearUpdatedIssue = createTrigger({
     
     // Create webhook configuration
     const webhookConfig: any = {
-      label: 'ActivePieces Updated Issue',
+      label: 'iCustomer Updated Issue',
       url: context.webhookUrl,
       allPublicTeams: true,
       resourceTypes: ['Issue']
