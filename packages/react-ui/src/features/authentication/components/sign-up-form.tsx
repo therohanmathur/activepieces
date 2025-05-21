@@ -73,27 +73,28 @@ const SignUpForm = ({
   const websiteName = flagsHooks.useWebsiteBranding()?.websiteName;
   const { data: edition } = flagsHooks.useFlag<ApEdition>(ApFlagId.EDITION);
   const showNewsLetterCheckbox = useMemo(() => {
-    if (!edition || !websiteName) {
-      return false;
-    }
-    switch (edition) {
-      case ApEdition.CLOUD: {
-        if (
-          typeof websiteName === 'string' &&
-          websiteName.toLowerCase() === 'activepieces'
-        ) {
-          form.setValue('newsLetter', true);
-          return true;
-        }
-        return false;
-      }
-      case ApEdition.ENTERPRISE:
-        return false;
-      case ApEdition.COMMUNITY: {
-        form.setValue('newsLetter', true);
-        return true;
-      }
-    }
+    // if (!edition || !websiteName) {
+    //   return false;
+    // }
+    // switch (edition) {
+    //   case ApEdition.CLOUD: {
+    //     if (
+    //       typeof websiteName === 'string' &&
+    //       websiteName.toLowerCase() === 'activepieces'
+    //     ) {
+    //       form.setValue('newsLetter', true);
+    //       return true;
+    //     }
+    //     return false;
+    //   }
+    //   case ApEdition.ENTERPRISE:
+    //     return false;
+    //   case ApEdition.COMMUNITY: {
+    //     form.setValue('newsLetter', true);
+    //     return true;
+    //   }
+    // }
+    return false;
   }, [edition, websiteName]);
 
   const redirectAfterLogin = useRedirectAfterLogin();

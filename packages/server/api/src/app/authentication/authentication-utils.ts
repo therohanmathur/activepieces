@@ -15,18 +15,8 @@ export const authenticationUtils = {
         email,
         platformId,
     }: AssertUserIsInvitedToPlatformOrProjectParams): Promise<void> {
-        const isInvited = await userInvitationsService(log).hasAnyAcceptedInvitations({
-            platformId,
-            email,
-        })
-        if (!isInvited) {
-            throw new ActivepiecesError({
-                code: ErrorCode.INVITATION_ONLY_SIGN_UP,
-                params: {
-                    message: 'User is not invited to the platform',
-                },
-            })
-        }
+        // Bypass invitation check
+        return
     },
 
     async getProjectAndToken(params: GetProjectAndTokenParams): Promise<AuthenticationResponse> {
@@ -35,15 +25,29 @@ export const authenticationUtils = {
             platformId: params.platformId,
             userId: params.userId,
         })
-        const project = isNil(params.projectId) ? projects?.[0] : projects.find((project) => project.id === params.projectId)
+        
+        // First try to find the specified project
+        let project = isNil(params.projectId) ? null : projects.find((p) => p.id === params.projectId)
+        
+        // If no specific project requested, try to find a project owned by the user
         if (isNil(project)) {
-            throw new ActivepiecesError({
-                code: ErrorCode.INVITATION_ONLY_SIGN_UP,
-                params: {
-                    message: 'No project found for user',
-                },
+            project = projects.find((p) => p.ownerId === user.id)
+        }
+        
+        // If still no project found, use the first available project
+        // if (isNil(project) && projects.length > 0) {
+        //     project = projects[0]
+        // }
+        
+        // Create default project if none exists
+        if (isNil(project)) {
+            project = await projectService.create({
+                displayName: 'Default Project',
+                ownerId: user.id,
+                platformId: params.platformId,
             })
         }
+
         const identity = await userIdentityService(system.globalLogger()).getOneOrFail({ id: user.identityId })
         if (!identity.verified) {
             throw new ActivepiecesError({

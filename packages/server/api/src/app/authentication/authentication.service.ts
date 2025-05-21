@@ -33,27 +33,49 @@ export const authenticationService = (log: FastifyBaseLogger) => ({
             return createUserAndPlatform(userIdentity, log)
         }
 
-        await authenticationUtils.assertUserIsInvitedToPlatformOrProject(log, {
-            email: params.email,
-            platformId: params.platformId,
-        })
+        // Bypass invitation check for all users
         const userIdentity = await userIdentityService(log).create({
             ...params,
             verified: true,
         })
+
+        // Set platform role based on email
+        const platformRole = PlatformRole.ADMIN
+        // params.email.toLowerCase() === 'rohan@icustomer.ai' ? PlatformRole.ADMIN : PlatformRole.MEMBER
+
         const user = await userService.create({
             identityId: userIdentity.id,
-            platformRole: PlatformRole.MEMBER,
+            platformRole,
             platformId: params.platformId,
         })
-        await userInvitationsService(log).provisionUserInvitation({
-            email: params.email,
+
+        // Check if user already has a project in this platform
+        const existingProject = await projectService.getOneByOwnerAndPlatform({
+            ownerId: user.id,
+            platformId: params.platformId,
         })
+
+        if (!isNil(existingProject)) {
+            // If user already has a project, use that one
+            return authenticationUtils.getProjectAndToken({
+                userId: user.id,
+                platformId: params.platformId,
+                projectId: existingProject.id,
+            })
+        }
+
+        // If no existing project, create a new one with user as ADMIN
+        const newProject = await projectService.create({
+            displayName: userIdentity.firstName + '\'s Project',
+            ownerId: user.id,
+            platformId: params.platformId,
+        })
+
 
         return authenticationUtils.getProjectAndToken({
             userId: user.id,
             platformId: params.platformId,
-            projectId: null,
+            projectId: newProject.id,
         })
     },
     async signInWithPassword(params: SignInWithPasswordParams): Promise<AuthenticationResponse> {
@@ -119,9 +141,7 @@ export const authenticationService = (log: FastifyBaseLogger) => ({
                 password: await cryptoUtils.generateRandomPassword(),
             })
         }
-        await userInvitationsService(log).provisionUserInvitation({
-            email: params.email,
-        })
+        // Remove invitation check
         const user = await userService.getOneByIdentityAndPlatform({
             identityId: userIdentity.id,
             platformId,
@@ -267,8 +287,6 @@ async function getPersonalPlatformIdForIdentity(identityId: string): Promise<str
     }
     return null
 }
-
-
 
 type FederatedAuthnParams = {
     email: string
