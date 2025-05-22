@@ -4,6 +4,7 @@ import {
   FlowTemplate,
   ListFlowTemplatesRequest,
   SeekPage,
+  TemplateType,
 } from '@activepieces/shared';
 
 export const templatesApi = {
@@ -13,7 +14,7 @@ export const templatesApi = {
   create(request: CreateFlowTemplateRequest) {
     return api.post<FlowTemplate>(`/v1/flow-templates`, request);
   },
-  list(request?: ListFlowTemplatesRequest) {
+  list(request?: ListFlowTemplatesRequest & { type?: TemplateType }) {
     return api.get<SeekPage<FlowTemplate>>(`/v1/flow-templates`, request ?? {});
   },
   delete(templateId: string) {

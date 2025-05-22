@@ -98,6 +98,7 @@ function getEntities(): EntitySchema<unknown>[] {
         TodoEntity,
         McpEntity,
         McpPieceEntity,
+        FlowTemplateEntity,
     ]
 
     switch (edition) {
@@ -111,7 +112,6 @@ function getEntities(): EntitySchema<unknown>[] {
                 OAuthAppEntity,
                 OtpEntity,
                 ApiKeyEntity,
-                FlowTemplateEntity,
                 GitRepoEntity,
                 AuditEventEntity,
                 ProjectReleaseEntity,

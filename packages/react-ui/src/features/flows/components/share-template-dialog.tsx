@@ -1,31 +1,32 @@
-import { typeboxResolver } from '@hookform/resolvers/typebox';
-import { DialogDescription, DialogTrigger } from '@radix-ui/react-dialog';
-import { Static, Type } from '@sinclair/typebox';
 import { useMutation } from '@tanstack/react-query';
 import { t } from 'i18next';
-import React, { useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { typeboxResolver } from '@hookform/resolvers/typebox';
+import { Static, Type } from '@sinclair/typebox';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { INTERNAL_ERROR_TOAST, toast } from '@/components/ui/use-toast';
 import { flowsApi } from '@/features/flows/lib/flows-api';
 import { templatesApi } from '@/features/templates/lib/templates-api';
-import { useNewWindow } from '@/lib/navigation-utils';
 import { FlowTemplate, TemplateType } from '@activepieces/shared';
 
 const ShareTemplateSchema = Type.Object({
-  description: Type.String(),
-  blogUrl: Type.Optional(Type.String()),
-  tags: Type.Optional(Type.Array(Type.String())),
+  description: Type.String({
+    minLength: 1,
+    errorMessage: t('Description is required'),
+  }),
 });
 
 type ShareTemplateSchema = Static<typeof ShareTemplateSchema>;
@@ -36,10 +37,11 @@ const ShareTemplateDialog: React.FC<{
   flowVersionId: string;
 }> = ({ children, flowId, flowVersionId }) => {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
   const shareTemplateForm = useForm<ShareTemplateSchema>({
     resolver: typeboxResolver(ShareTemplateSchema),
   });
-  const openNewIndow = useNewWindow();
+
   const { mutate, isPending } = useMutation<
     FlowTemplate,
     Error,
@@ -52,7 +54,7 @@ const ShareTemplateDialog: React.FC<{
 
       const flowTemplate = await templatesApi.create({
         template: template.template,
-        type: TemplateType.PROJECT,
+        type: TemplateType.PLATFORM,
         blogUrl: template.blogUrl,
         tags: template.tags,
         description: shareTemplateForm.getValues().description,
@@ -60,9 +62,9 @@ const ShareTemplateDialog: React.FC<{
 
       return flowTemplate;
     },
-    onSuccess: (data) => {
-      openNewIndow(`/templates/${data.id}`);
+    onSuccess: () => {
       setIsShareDialogOpen(false);
+      setIsSuccessDialogOpen(true);
     },
     onError: () => toast(INTERNAL_ERROR_TOAST),
   });
@@ -77,59 +79,63 @@ const ShareTemplateDialog: React.FC<{
   };
 
   return (
-    <Dialog
-      open={isShareDialogOpen}
-      onOpenChange={(open) => setIsShareDialogOpen(open)}
-    >
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t('Share Template')}</DialogTitle>
-          <DialogDescription className="flex flex-col gap-2">
-            <span>
-              {t(
-                'Generate or update a template link for the current flow to easily share it with others.',
-              )}
-            </span>
-            <span>
-              {t(
-                'The template will not have any credentials in connection fields, keeping sensitive information secure.',
-              )}
-            </span>
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...shareTemplateForm}>
-          <form
-            className="grid space-y-4"
-            onSubmit={shareTemplateForm.handleSubmit(onShareTemplateSubmit)}
-          >
-            <FormField
-              control={shareTemplateForm.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem className="grid space-y-2">
-                  <Label htmlFor="description">{t('Description')}</Label>
-                  <Input
-                    {...field}
-                    required
-                    id="description"
-                    placeholder={t('A short description of the template')}
-                    className="rounded-sm"
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {shareTemplateForm?.formState?.errors?.root?.serverError && (
-              <FormMessage>
-                {shareTemplateForm.formState.errors.root.serverError.message}
-              </FormMessage>
-            )}
-            <Button loading={isPending}>{t('Confirm')}</Button>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('Share Template')}</DialogTitle>
+            <DialogDescription>
+              {t('Generate or update a template link for the current flow to easily share it with others.')}
+              <br />
+              {t('The template will not have any credentials in connection fields, keeping sensitive information secure.')}
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...shareTemplateForm}>
+            <form onSubmit={shareTemplateForm.handleSubmit(onShareTemplateSubmit)}>
+              <FormField
+                control={shareTemplateForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <Textarea
+                      {...field}
+                      placeholder={t('A short description of the template')}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button
+                  type="submit"
+                  loading={isPending}
+                  disabled={isPending}
+                >
+                  {t('Share Template')}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('Template Shared Successfully')}</DialogTitle>
+            <DialogDescription>
+              {t('Your template has been shared and is now visible in the Browse Templates dialog.')}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setIsSuccessDialogOpen(false)}>
+              {t('Close')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

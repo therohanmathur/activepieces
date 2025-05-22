@@ -1187,5 +1187,16 @@
   "Select a project role": "Select a project role",
   "Steps in this flow": "Steps in this flow",
   "Invalid Access": "Invalid Access",
-  "Either the project does not exist or you do not have access to it.": "Either the project does not exist or you do not have access to it."
+  "Either the project does not exist or you do not have access to it.": "Either the project does not exist or you do not have access to it.",
+  "Share Template": "Share Template",
+  "Generate or update a template link for the current flow to easily share it with others.": "Generate or update a template link for the current flow to easily share it with others.",
+  "The template will not have any credentials in connection fields, keeping sensitive information secure.": "The template will not have any credentials in connection fields, keeping sensitive information secure.",
+  "A short description of the template": "A short description of the template",
+  "Template Created Successfully!": "Template Created Successfully!",
+  "Your template has been created. Share this link with anyone who wants to use your template.": "Your template has been created. Share this link with anyone who wants to use your template.",
+  "Shareable Link": "Shareable Link",
+  "Copy": "Copy",
+  "Copied!": "Copied!",
+  "Link copied to clipboard": "Link copied to clipboard",
+  "Close": "Close"
 }

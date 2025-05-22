@@ -137,6 +137,15 @@ export class initializeSchema1676238396411 implements MigrationInterface {
             'ALTER TABLE "app_connection" ADD CONSTRAINT "fk_app_connection_app_project_id" FOREIGN KEY ("projectId") REFERENCES "project"("id") ON DELETE CASCADE ON UPDATE NO ACTION',
         )
 
+        await queryRunner.query(
+            'CREATE TABLE "flow_template" ("id" character varying(21) NOT NULL, "created" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "name" character varying NOT NULL, "description" character varying NOT NULL, "type" character varying NOT NULL, "platformId" character varying NOT NULL, "projectId" character varying, "template" jsonb NOT NULL, "tags" character varying array NOT NULL, "pieces" character varying array NOT NULL, "blogUrl" character varying, "metadata" jsonb, CONSTRAINT "PK_flow_template" PRIMARY KEY ("id"))',
+        )
+
+        await queryRunner.query('CREATE INDEX "idx_flow_template_tags" ON "flow_template" ("tags")')
+        await queryRunner.query('CREATE INDEX "idx_flow_template_pieces" ON "flow_template" ("pieces")')
+        await queryRunner.query('CREATE INDEX "idx_flow_template_platform_id" ON "flow_template" ("platformId")')
+        await queryRunner.query('CREATE INDEX "idx_flow_template_project_id" ON "flow_template" ("projectId")')
+
         log.info('initializeSchema1676238396411: completed')
     }
 
@@ -211,5 +220,10 @@ export class initializeSchema1676238396411 implements MigrationInterface {
         await queryRunner.query('DROP TABLE "collection_version"')
         await queryRunner.query('DROP INDEX "idx_collection_project_id"')
         await queryRunner.query('DROP TABLE "collection"')
+        await queryRunner.query('DROP INDEX "idx_flow_template_project_id"')
+        await queryRunner.query('DROP INDEX "idx_flow_template_platform_id"')
+        await queryRunner.query('DROP INDEX "idx_flow_template_pieces"')
+        await queryRunner.query('DROP INDEX "idx_flow_template_tags"')
+        await queryRunner.query('DROP TABLE "flow_template"')
     }
 }

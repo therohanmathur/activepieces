@@ -103,6 +103,9 @@ export class InitialSql3Migration1690195839899 implements MigrationInterface {
         await queryRunner.query(
             'CREATE UNIQUE INDEX "idx_piece_metadata_name_project_id_version" ON "piece_metadata" ("name", "version", "projectId") ',
         )
+        await queryRunner.query(
+            'CREATE TABLE "flow_template" ("id" varchar(21) PRIMARY KEY NOT NULL, "created" datetime NOT NULL DEFAULT (datetime(\'now\')), "updated" datetime NOT NULL DEFAULT (datetime(\'now\')), "name" varchar NOT NULL, "description" varchar NOT NULL, "type" varchar NOT NULL, "platformId" varchar NOT NULL, "projectId" varchar, "template" text NOT NULL, "tags" text NOT NULL, "pieces" text NOT NULL, "blogUrl" varchar, "metadata" text)',
+        )
         await queryRunner.query('DROP INDEX "idx_trigger_event_flow_id"')
         await queryRunner.query(
             'CREATE TABLE "temporary_trigger_event" ("id" varchar(21) PRIMARY KEY NOT NULL, "created" datetime NOT NULL DEFAULT (datetime(\'now\')), "updated" datetime NOT NULL DEFAULT (datetime(\'now\')), "flowId" varchar(21) NOT NULL, "projectId" varchar(21) NOT NULL, "sourceName" varchar NOT NULL, "payload" text, CONSTRAINT "fk_trigger_event_project_id" FOREIGN KEY ("projectId") REFERENCES "project" ("id") ON DELETE CASCADE ON UPDATE NO ACTION, CONSTRAINT "fk_trigger_event_flow_id" FOREIGN KEY ("flowId") REFERENCES "flow" ("id") ON DELETE CASCADE ON UPDATE NO ACTION)',
@@ -477,5 +480,6 @@ export class InitialSql3Migration1690195839899 implements MigrationInterface {
         await queryRunner.query('DROP TABLE "flow_instance"')
         await queryRunner.query('DROP INDEX "idx_trigger_event_flow_id"')
         await queryRunner.query('DROP TABLE "trigger_event"')
+        await queryRunner.query('DROP TABLE "flow_template"')
     }
 }
