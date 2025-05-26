@@ -22,10 +22,10 @@ export const DefaultRoute = () => {
     );
   }
 
-  // If we have a current project, redirect to its dashboard
-  if (currentProject) {
-    return <Navigate to={`/projects/${currentProject.id}`} replace />;
-  }
+  // If we have a current project, redirect to its dashboard => This is causing issue & giving a blank screen on consequent loading
+  // if (currentProject) {
+  //   return <Navigate to={`/projects/${currentProject.id}`} replace />;
+  // }
 
   // Otherwise use the default route based on permissions
   return <Navigate to={determineDefaultRoute(checkAccess)} replace />;
