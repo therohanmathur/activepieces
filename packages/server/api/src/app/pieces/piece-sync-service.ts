@@ -17,6 +17,20 @@ const CLOUD_API_URL = 'https://cloud.activepieces.com/api/v1/pieces'
 const piecesRepo = repoFactory(PieceMetadataEntity)
 const syncMode = system.get<PieceSyncMode>(AppSystemProp.PIECES_SYNC_MODE)
 
+// Function to transform piece names
+function transformPieceName(name: string): string {
+    return name.replace('@activepieces', '@icustomer')
+}
+
+// Function to transform piece metadata
+function transformPieceMetadata(piece: PieceMetadataModel): PieceMetadataModel {
+    return {
+        ...piece,
+        name: transformPieceName(piece.name),
+        // displayName: piece.displayName.replace('Activepieces', 'iCustomer'),
+    }
+}
+
 export const pieceSyncService = (log: FastifyBaseLogger) => ({
     async setup(): Promise<void> {
         if (syncMode !== PieceSyncMode.OFFICIAL_AUTO) {
@@ -49,7 +63,8 @@ export const pieceSyncService = (log: FastifyBaseLogger) => ({
             const promises: Promise<void>[] = []
 
             for (const summary of pieces) {
-                const lastVersionSynced = await existsInDatabase({ name: summary.name, version: summary.version })
+                const transformedName = transformPieceName(summary.name)
+                const lastVersionSynced = await existsInDatabase({ name: transformedName, version: summary.version })
                 if (!lastVersionSynced) {
                     promises.push(syncPiece(summary.name, log))
                 }
@@ -67,11 +82,13 @@ async function syncPiece(name: string, log: FastifyBaseLogger): Promise<void> {
         log.info({ name }, 'Syncing piece metadata into database')
         const versions = await getVersions({ name })
         for (const version of Object.keys(versions)) {
-            const currentVersionSynced = await existsInDatabase({ name, version })
+            const transformedName = transformPieceName(name)
+            const currentVersionSynced = await existsInDatabase({ name: transformedName, version })
             if (!currentVersionSynced) {
                 const piece = await getOrThrow({ name, version })
+                const transformedPiece = transformPieceMetadata(piece)
                 await pieceMetadataService(log).create({
-                    pieceMetadata: piece,
+                    pieceMetadata: transformedPiece,
                     packageType: piece.packageType,
                     pieceType: piece.pieceType,
                 })
@@ -81,8 +98,8 @@ async function syncPiece(name: string, log: FastifyBaseLogger): Promise<void> {
     catch (error) {
         log.error(error, 'Error syncing piece, please upgrade the activepieces to latest version')
     }
-
 }
+
 async function existsInDatabase({ name, version }: { name: string, version: string }): Promise<boolean> {
     return piecesRepo().existsBy({
         name,
