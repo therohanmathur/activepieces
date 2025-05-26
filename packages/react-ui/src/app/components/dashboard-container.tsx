@@ -1,5 +1,5 @@
 import { t } from 'i18next';
-import { ListTodo, Package, Server, Table2, Workflow } from 'lucide-react';
+import { ListTodo, Package, Server, Table2, Workflow, Link2 } from 'lucide-react';
 import { createContext, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
@@ -83,7 +83,7 @@ export function DashboardContainer({
     to: authenticationSession.appendProjectRoutePrefix('/flows'),
     icon: Workflow,
     label: t('Flows'),
-    name: t('Products'),
+    name: t(''),
     showInEmbed: true,
     hasPermission: checkAccess(Permission.READ_FLOW),
     isSubItem: false,
@@ -91,6 +91,16 @@ export function DashboardContainer({
       pathname.includes('/flows') ||
       pathname.includes('/runs') ||
       pathname.includes('/issues'),
+  };
+
+  const connectionsLink: SidebarLink = {
+    type: 'link',
+    to: authenticationSession.appendProjectRoutePrefix('/connections'),
+    icon: Link2,
+    label: t('Connections'),
+    showInEmbed: true,
+    hasPermission: checkAccess(Permission.READ_APP_CONNECTION),
+    isSubItem: false,
   };
 
   const mcpLink: SidebarLink = {
@@ -123,12 +133,14 @@ export function DashboardContainer({
     isSubItem: false,
   };
 
+  // Rohan's Modifications
   const items: SidebarItem[] = [
     flowsLink,
-    releasesLink,
-    mcpLink,
-    tablesLink,
-    todosLink,
+    connectionsLink,
+    // releasesLink,
+    // mcpLink,
+    // tablesLink,
+    // todosLink,
   ]
     .filter(embedFilter)
     .filter(permissionFilter)

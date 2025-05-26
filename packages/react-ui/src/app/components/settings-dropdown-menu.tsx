@@ -47,40 +47,41 @@ const SettingsDropdownMenu = () => {
     {
       title: t('General'),
       href: authenticationSession.appendProjectRoutePrefix('/settings/general'),
-      icon: <Settings className="w-4 h-4" />,
+      icon: <Settings className="w-4 h-4 -ml-1" />,
     },
-    {
-      title: t('Appearance'),
-      href: authenticationSession.appendProjectRoutePrefix(
-        '/settings/appearance',
-      ),
-      icon: <SunMoon className="h-4 w-4" />,
-    },
-    {
-      title: t('Team'),
-      href: authenticationSession.appendProjectRoutePrefix('/settings/team'),
-      icon: <Users className="h-4 w-4" />,
-      hasPermission: checkAccess(Permission.READ_PROJECT_MEMBER),
-    },
-    {
-      title: t('Pieces'),
-      href: authenticationSession.appendProjectRoutePrefix('/settings/pieces'),
-      icon: <Puzzle className="h-4 w-4" />,
-    },
-    {
-      title: t('Alerts'),
-      href: authenticationSession.appendProjectRoutePrefix('/settings/alerts'),
-      icon: <Bell className="h-4 w-4" />,
-      hasPermission: checkAccess(Permission.READ_ALERT),
-    },
-    {
-      title: t('Environments'),
-      href: authenticationSession.appendProjectRoutePrefix(
-        '/settings/environments',
-      ),
-      icon: <GitBranch className="w-4 h-4" />,
-      hasPermission: checkAccess(Permission.READ_PROJECT_RELEASE),
-    },
+    // Rohan's Modifications
+    // {
+    //   title: t('Appearance'),
+    //   href: authenticationSession.appendProjectRoutePrefix(
+    //     '/settings/appearance',
+    //   ),
+    //   icon: <SunMoon className="h-4 w-4" />,
+    // },
+    // {
+    //   title: t('Team'),
+    //   href: authenticationSession.appendProjectRoutePrefix('/settings/team'),
+    //   icon: <Users className="h-4 w-4" />,
+    //   hasPermission: checkAccess(Permission.READ_PROJECT_MEMBER),
+    // },
+    // {
+    //   title: t('Pieces'),
+    //   href: authenticationSession.appendProjectRoutePrefix('/settings/pieces'),
+    //   icon: <Puzzle className="h-4 w-4" />,
+    // },
+    // {
+    //   title: t('Alerts'),
+    //   href: authenticationSession.appendProjectRoutePrefix('/settings/alerts'),
+    //   icon: <Bell className="h-4 w-4" />,
+    //   hasPermission: checkAccess(Permission.READ_ALERT),
+    // },
+    // {
+    //   title: t('Environments'),
+    //   href: authenticationSession.appendProjectRoutePrefix(
+    //     '/settings/environments',
+    //   ),
+    //   icon: <GitBranch className="w-4 h-4" />,
+    //   hasPermission: checkAccess(Permission.READ_PROJECT_RELEASE),
+    // },
   ];
 
   const filterAlerts = (item: ProjectSettingsLinkItem) =>

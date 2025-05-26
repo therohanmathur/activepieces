@@ -152,13 +152,13 @@ function AppConnectionsPage() {
       }),
       icon: CheckIcon,
     } as const,
-    {
-      type: 'select',
-      title: t('Pieces'),
-      accessorKey: 'pieceName',
-      icon: AppWindow,
-      options: pieceOptions,
-    } as const,
+    // {
+    //   type: 'select',
+    //   title: t('Pieces'),
+    //   accessorKey: 'pieceName',
+    //   icon: AppWindow,
+    //   options: pieceOptions,
+    // } as const,
     {
       type: 'input',
       title: t('Display Name'),
@@ -166,13 +166,13 @@ function AppConnectionsPage() {
       icon: Tag,
       options: [],
     } as const,
-    {
-      type: 'select',
-      title: t('Owner'),
-      accessorKey: 'owner',
-      icon: User,
-      options: ownersOptions ?? [],
-    } as const,
+    // {
+    //   type: 'select',
+    //   title: t('Owner'),
+    //   accessorKey: 'owner',
+    //   icon: User,
+    //   options: ownersOptions ?? [],
+    // } as const,
   ];
 
   const columns: ColumnDef<
@@ -330,26 +330,26 @@ function AppConnectionsPage() {
         );
       },
     },
-    {
-      accessorKey: 'owner',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('Owner')} />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="text-left">
-            {row.original.owner && (
-              <UserFullName
-                firstName={row.original.owner.firstName}
-                lastName={row.original.owner.lastName}
-                email={row.original.owner.email}
-              />
-            )}
-            {!row.original.owner && <div className="text-left">-</div>}
-          </div>
-        );
-      },
-    },
+    // {
+    //   accessorKey: 'owner',
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title={t('Owner')} />
+    //   ),
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className="text-left">
+    //         {row.original.owner && (
+    //           <UserFullName
+    //             firstName={row.original.owner.firstName}
+    //             lastName={row.original.owner.lastName}
+    //             email={row.original.owner.email}
+    //           />
+    //         )}
+    //         {!row.original.owner && <div className="text-left">-</div>}
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       accessorKey: 'flowCount',
       header: ({ column }) => (
@@ -486,7 +486,8 @@ function AppConnectionsPage() {
         render: () => {
           return (
             <div className="flex items-center gap-2">
-              <PermissionNeededTooltip
+              {/* Rohan's Modifications */}
+              {/* <PermissionNeededTooltip
                 hasPermission={userHasPermissionToWriteAppConnection}
               >
                 <ReplaceConnectionsDialog
@@ -505,7 +506,7 @@ function AppConnectionsPage() {
                     <span className="ml-2">{t('Replace')}</span>
                   </Button>
                 </ReplaceConnectionsDialog>
-              </PermissionNeededTooltip>
+              </PermissionNeededTooltip> */}
               <PermissionNeededTooltip
                 hasPermission={userHasPermissionToWriteAppConnection}
               >

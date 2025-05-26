@@ -53,24 +53,25 @@ const ApDashboardSidebarHeader = ({
     );
   };
 
+  // Rohan's Modifications
   return (
-    <SidebarHeader className="pb-0">
+    <SidebarHeader className="py-3 ml-6">
       <div
         className={cn('flex items-center justify-between grow gap-1', {
           'justify-start': !isHomeDashboard,
         })}
       >
-        <Button
+        {/* <Button
           variant="ghost"
           className={cn({ 'w-full': !isHomeDashboard && !showProjectSwitcher })}
-        >
-          <Link to={isHomeDashboard ? defaultRoute : '/platform'}>
+        > */}
+          <Link to={isHomeDashboard ? defaultRoute : '/platform'} className='w-full'>
             <Tooltip>
               <TooltipTrigger asChild>{renderLogo()}</TooltipTrigger>
-              <TooltipContent side="bottom">{t('Home')}</TooltipContent>
+              {/* <TooltipContent side="bottom">{t('Home')}</TooltipContent> */}
             </Tooltip>
           </Link>
-        </Button>
+        {/* </Button> */}
 
         {showProjectSwitcher && (
           <div className="grow">
