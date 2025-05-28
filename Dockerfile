@@ -38,6 +38,10 @@ RUN pnpm store add @tsconfig/node18@1.0.0 \
 ### STAGE 1: Build ###
 FROM base AS build
 
+# Add build arguments
+ARG VITE_API_TOKEN
+ENV VITE_API_TOKEN=$VITE_API_TOKEN
+
 WORKDIR /usr/src/app
 
 # Copy and install dependencies

@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - VITE_API_TOKEN=${VITE_API_TOKEN}
     ports:
       - "8080:80"
     env_file:
