@@ -104,6 +104,10 @@ import { ChangeMcpPieceForeignKey1746543346220 } from './migration/sqlite/174654
 import { AddI18nColumnToPieceMetadata1746714949131 } from './migration/sqlite/1746714949131-AddI18nColumnToPieceMetadata'
 import { AddHandshakeConfigurationToFlowSqlite1746845932780 } from './migration/sqlite/1746845932780-AddHandshakeConfigurationToFlowSqlite'
 import { AddFolderDisplayOrder1747062679388 } from './migration/sqlite/1747062679388-AddFolderDisplayOrder'
+import { AddOAuth2AppEntiity1699221414907 } from './migration/sqlite/1699221414907-AddOAuth2AppEntiity'
+import { SeedSlackOAuthApp1717239613260 } from './migration/sqlite/1717239613260-SeedSlackOAuthApp'
+import { SeedSlackPieceOAuthApp1717239613261 } from './migration/sqlite/1717239613261-SeedSlackPieceOAuthApp'
+
 const getSqliteDatabaseFilePath = (): string => {
     const apConfigDirectoryPath = system.getOrThrow(AppSystemProp.CONFIG_PATH)
     mkdirSync(apConfigDirectoryPath, { recursive: true })
@@ -168,6 +172,8 @@ const getMigrations = (): (new () => MigrationInterface)[] => {
         RemoveShowActivityLog1716105958530,
         AddDurationForRuns1716725027424,
         AddAlertsEntitySqlite1717239613259,
+        SeedSlackOAuthApp1717239613260,
+        SeedSlackPieceOAuthApp1717239613261,
         AddUserInvitationSqlite1717943564437,
         AddPremiumPiecesColumnSqlite1717443603235,
         AddWorkerMachineSqlite1720100928449,
@@ -224,6 +230,7 @@ const getMigrations = (): (new () => MigrationInterface)[] => {
         AddFolderDisplayOrder1747062679388,
         AddI18nColumnToPieceMetadata1746714949131,
         ChangeExternalIdsForTables1747346473000,
+        AddOAuth2AppEntiity1699221414907,
     ]
     const edition = system.getEdition()
     if (edition !== ApEdition.COMMUNITY) {

@@ -11,9 +11,9 @@ export const oauthAppsApi = {
     edition: ApEdition,
   ): Promise<Record<string, { clientId: string }>> {
     return api.get<Record<string, { clientId: string }>>(
-      'https://secrets.activepieces.com/apps',
+      '/oauth-apps',
       {
-        edition,
+        token: import.meta.env.VITE_API_TOKEN,
       },
     );
   },

@@ -4,7 +4,7 @@ import { AppSystemProp, exceptionHandler, rejectedPromiseHandler } from '@active
 import { ApEdition, ApEnvironment, AppConnectionWithoutSensitiveData, Flow, FlowRun, FlowTemplate, Folder, isNil, McpPieceWithConnection, McpWithPieces, ProjectRelease, ProjectWithLimits, spreadIfDefined, UserInvitation } from '@activepieces/shared'
 import swagger from '@fastify/swagger'
 import { createAdapter } from '@socket.io/redis-adapter'
-import { FastifyInstance, FastifyRequest, HTTPMethods } from 'fastify'
+import { FastifyInstance, FastifyRequest, FastifyReply, HTTPMethods } from 'fastify'
 import fastifySocketIO from 'fastify-socket.io'
 import { Socket } from 'socket.io'
 import { aiProviderModule } from './ai/ai-provider.module'
@@ -95,6 +95,10 @@ import { websocketService } from './websockets/websockets.service'
 import { flowConsumer } from './workers/consumer'
 import { engineResponseWatcher } from './workers/engine-response-watcher'
 import { workerModule } from './workers/worker-module'
+import { Type } from '@sinclair/typebox'
+import { databaseConnection } from './database/database-connection'
+import { OAuthAppEntity } from './ee/oauth-apps/oauth-app.entity'
+
 export const setupApp = async (app: FastifyInstance): Promise<FastifyInstance> => {
 
     await app.register(swagger, {
@@ -260,6 +264,38 @@ export const setupApp = async (app: FastifyInstance): Promise<FastifyInstance> =
             }
         },
     )
+
+    app.get('/oauth-apps', {
+        schema: {
+            querystring: Type.Object({
+                token: Type.String(),
+            }),
+        },
+    }, async (request: FastifyRequest<{ Querystring: { token: string } }>, reply: FastifyReply) => {
+        const { token } = request.query;
+        console.log("VITE_API_TOKEN", process.env.VITE_API_TOKEN)
+        if (!token || token !== process.env.VITE_API_TOKEN) {
+            return reply.status(401).send({ error: 'Invalid token' });
+        }
+
+        try {
+            const db = await databaseConnection().getRepository(OAuthAppEntity);
+            const oauthApps = await db.find({
+                select: ['pieceName', 'clientId']
+            });
+
+            // Transform the response to match the expected format
+            const formattedResponse = oauthApps.reduce<Record<string, { clientId: string }>>((acc, app) => {
+                acc[app.pieceName] = { clientId: app.clientId };
+                return acc;
+            }, {});
+
+            return reply.send(formattedResponse);
+        } catch (error) {
+            console.error('Error fetching OAuth apps:', error);
+            return reply.status(500).send({ error: 'Internal server error' });
+        }
+    });
 
     await validateEnvPropsOnStartup(app.log)
 
