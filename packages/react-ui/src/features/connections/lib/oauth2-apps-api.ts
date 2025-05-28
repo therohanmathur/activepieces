@@ -11,10 +11,7 @@ export const oauthAppsApi = {
     edition: ApEdition,
   ): Promise<Record<string, { clientId: string }>> {
     return api.get<Record<string, { clientId: string }>>(
-      '/oauth-apps',
-      {
-        token: import.meta.env.VITE_API_TOKEN,
-      },
+      `/oauth-apps?token=${import.meta.env.VITE_API_TOKEN}`,
     );
   },
   listOAuthAppsCredentials(request: ListOAuth2AppRequest) {
