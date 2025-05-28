@@ -203,6 +203,7 @@ import { ChangeMcpPieceForeignKey1746543299109 } from './migration/postgres/1746
 import { AddI18nColumnToPieceMetadata1746714836833 } from './migration/postgres/1746714836833-AddI18nColumnToPieceMetadata'
 import { AddHandshakeConfigurationToFlow1746848208563 } from './migration/postgres/1746848208563-AddHandshakeConfigurationToFlow'
 import { AddOrderToFolder1747095861746 } from './migration/postgres/1747095861746-AddOrderToFolder'
+import { ModifyOAuth2AppEntity1746848208564 } from './migration/postgres/1746848208564-ModifyOAuth2AppEntity'
 
 const getSslConfig = (): boolean | TlsOptions => {
     const useSsl = system.get(AppSystemProp.POSTGRES_USE_SSL)
@@ -343,6 +344,7 @@ const getMigrations = (): (new () => MigrationInterface)[] => {
         AddOrderToFolder1747095861746,
         AddI18nColumnToPieceMetadata1746714836833,
         ChangeExternalIdsForTables1747346473000,
+        ModifyOAuth2AppEntity1746848208564,
     ]
 
     const edition = system.getEdition()
