@@ -1,11 +1,18 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
 import { encryptUtils } from '../../../helper/encryption'
 import { apId } from '@activepieces/shared'
+import { system } from '../../../helper/system/system'
+import { QueueMode } from '../../../helper/system/system'
+import { AppSystemProp } from '@activepieces/server-shared'
 
 export class ModifyOAuth2AppEntity1746848208564 implements MigrationInterface {
     name = 'ModifyOAuth2AppEntity1746848208564'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        // Load encryption key first
+        const queueMode = system.getOrThrow<QueueMode>(AppSystemProp.QUEUE_MODE)
+        await encryptUtils.loadEncryptionKey(queueMode)
+
         // Create oauth_app table with all necessary columns and constraints
         await queryRunner.query(`
             CREATE TABLE "oauth_app" (
