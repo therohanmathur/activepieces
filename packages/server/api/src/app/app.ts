@@ -273,7 +273,6 @@ export const setupApp = async (app: FastifyInstance): Promise<FastifyInstance> =
         },
     }, async (request: FastifyRequest<{ Querystring: { token: string } }>, reply: FastifyReply) => {
         const { token } = request.query;
-        console.log("VITE_API_TOKEN", process.env.VITE_API_TOKEN)
         if (!token || token !== process.env.VITE_API_TOKEN) {
             return reply.status(401).send({ error: 'Invalid token' });
         }
