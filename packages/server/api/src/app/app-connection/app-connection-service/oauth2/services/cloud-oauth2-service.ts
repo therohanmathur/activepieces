@@ -44,63 +44,46 @@ export const cloudOAuth2Service = (log: FastifyBaseLogger): OAuth2Service<CloudO
         pieceName,
     }: ClaimOAuth2Request): Promise<CloudOAuth2ConnectionValue> => {
         try {
-            // 1. Prepare the token exchange request
-            const tokenExchangeBody: Record<string, string> = {
-                grant_type: 'authorization_code',
+            const cloudRequest: ClaimWithCloudRequest = {
                 code: request.code,
-                client_id: request.clientId,
-            }
-
-            if (request.redirectUrl) {
-                tokenExchangeBody.redirect_uri = request.redirectUrl
-            }
-
-            if (request.codeVerifier) {
-                tokenExchangeBody.code_verifier = request.codeVerifier
-            }
-
-            // 2. Set up headers based on authorization method
-            const headers: Record<string, string> = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Accept': 'application/json',
-            }
-
-            // 3. Make the token exchange request directly to the OAuth provider
-            log.info('Making token exchange request to OAuth provider:')
-            log.info({
-                tokenUrl: request.tokenUrl,
+                codeVerifier: request.codeVerifier,
+                authorizationMethod: request.authorizationMethod,
                 clientId: request.clientId,
-                redirectUrl: request.redirectUrl,
+                tokenUrl: request.tokenUrl,
+                pieceName,
+                edition: system.getEdition(),
+            }
+            
+            // Add detailed logging
+            log.info('Making claim request to secrets.activepieces.com/claim with:')
+            log.info({
+                request: cloudRequest,
+                pieceName,
+                tokenUrl: request.tokenUrl,
             })
 
-            const response = await axios.post(
-                request.tokenUrl,
-                new URLSearchParams(tokenExchangeBody).toString(),
+            const response = await axios.post<CloudOAuth2ConnectionValue>(
+                'https://secrets.activepieces.com/claim',
+                cloudRequest,
                 {
-                    headers,
                     timeout: 10000,
-                }
+                },
             )
 
-            // 4. Log the response
-            log.info('Received response from OAuth provider:')
+            // Log the response
+            log.info('Received response from secrets.activepieces.com/claim:')
             log.info({
                 status: response.status,
                 statusText: response.statusText,
                 data: response.data,
             })
 
-            // 5. Format and return the response
-            const value: CloudOAuth2ConnectionValue = {
-                ...response.data,
+            const value = response.data
+            return {
+                ...value,
                 token_url: request.tokenUrl,
-                client_id: request.clientId,
                 props: request.props,
-                type: AppConnectionType.CLOUD_OAUTH2,
-                claimed_at: Math.floor(Date.now() / 1000),
             }
-
-            return value
         }
         catch (e: unknown) {
             // Enhanced error logging
