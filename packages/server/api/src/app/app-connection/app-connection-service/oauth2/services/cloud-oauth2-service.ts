@@ -1,4 +1,3 @@
-
 import { OAuth2AuthorizationMethod } from '@activepieces/pieces-framework'
 import {
     ActivepiecesError,
@@ -54,15 +53,32 @@ export const cloudOAuth2Service = (log: FastifyBaseLogger): OAuth2Service<CloudO
                 pieceName,
                 edition: system.getEdition(),
             }
-            const value = (
-                await axios.post<CloudOAuth2ConnectionValue>(
-                    'https://secrets.activepieces.com/claim',
-                    cloudRequest,
-                    {
-                        timeout: 10000,
-                    },
-                )
-            ).data
+            
+            // Add detailed logging
+            log.info('Making claim request to secrets.activepieces.com/claim with:')
+            log.info({
+                request: cloudRequest,
+                pieceName,
+                tokenUrl: request.tokenUrl,
+            })
+
+            const response = await axios.post<CloudOAuth2ConnectionValue>(
+                'https://secrets.activepieces.com/claim',
+                cloudRequest,
+                {
+                    timeout: 10000,
+                },
+            )
+
+            // Log the response
+            log.info('Received response from secrets.activepieces.com/claim:')
+            log.info({
+                status: response.status,
+                statusText: response.statusText,
+                data: response.data,
+            })
+
+            const value = response.data
             return {
                 ...value,
                 token_url: request.tokenUrl,
@@ -70,7 +86,24 @@ export const cloudOAuth2Service = (log: FastifyBaseLogger): OAuth2Service<CloudO
             }
         }
         catch (e: unknown) {
-            log.error(e)
+            // Enhanced error logging
+            log.error('Error in cloudOAuth2Service.claim:')
+            if (axios.isAxiosError(e)) {
+                log.error({
+                    status: e.response?.status,
+                    statusText: e.response?.statusText,
+                    data: e.response?.data,
+                    headers: e.response?.headers,
+                    request: {
+                        url: e.config?.url,
+                        method: e.config?.method,
+                        data: e.config?.data,
+                        headers: e.config?.headers,
+                    }
+                })
+            } else {
+                log.error(e)
+            }
             throw new ActivepiecesError({
                 code: ErrorCode.INVALID_CLOUD_CLAIM,
                 params: {
