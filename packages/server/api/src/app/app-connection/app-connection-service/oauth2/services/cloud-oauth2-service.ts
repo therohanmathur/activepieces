@@ -13,6 +13,41 @@ import {
     OAuth2Service,
     RefreshOAuth2Request,
 } from '../oauth2-service'
+import { repoFactory } from '../../../../core/db/repo-factory'
+import { encryptUtils } from '../../../../helper/encryption'
+import { AppSystemProp } from '@activepieces/server-shared'
+import { EntitySchema } from 'typeorm'
+import { BaseColumnSchemaPart, JSONB_COLUMN_TYPE } from '../../../../database/database-common'
+import { EncryptedObject } from '../../../../helper/encryption'
+
+// Define a simplified OAuthAppEntity schema
+type OAuthAppSchema = {
+    pieceName: string
+    platformId: string
+    clientId: string
+    clientSecret: EncryptedObject
+}
+
+const OAuthAppEntity = new EntitySchema<OAuthAppSchema>({
+    name: 'oauth_app',
+    columns: {
+        ...BaseColumnSchemaPart,
+        pieceName: {
+            type: String,
+        },
+        platformId: {
+            type: String,
+        },
+        clientId: {
+            type: String,
+        },
+        clientSecret: {
+            type: JSONB_COLUMN_TYPE,
+        },
+    },
+})
+
+const oauthAppRepo = repoFactory(OAuthAppEntity)
 
 export const cloudOAuth2Service = (log: FastifyBaseLogger): OAuth2Service<CloudOAuth2ConnectionValue> => ({
     refresh: async ({
@@ -44,11 +79,19 @@ export const cloudOAuth2Service = (log: FastifyBaseLogger): OAuth2Service<CloudO
         pieceName,
     }: ClaimOAuth2Request): Promise<CloudOAuth2ConnectionValue> => {
         try {
-            // 1. Prepare the token exchange request
+            // 1. Get the OAuth app with decrypted client secret
+            const oauthApp = await oauthAppRepo().findOneByOrFail({
+                pieceName,
+                clientId: request.clientId,
+                platformId: system.getOrThrow(AppSystemProp.CLOUD_PLATFORM_ID),
+            })
+
+            // 2. Prepare the token exchange request
             const tokenExchangeBody: Record<string, string> = {
                 grant_type: 'authorization_code',
                 code: request.code,
                 client_id: request.clientId,
+                client_secret: encryptUtils.decryptString(oauthApp.clientSecret),
             }
 
             if (request.redirectUrl) {
@@ -59,13 +102,13 @@ export const cloudOAuth2Service = (log: FastifyBaseLogger): OAuth2Service<CloudO
                 tokenExchangeBody.code_verifier = request.codeVerifier
             }
 
-            // 2. Set up headers based on authorization method
+            // 3. Set up headers based on authorization method
             const headers: Record<string, string> = {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Accept': 'application/json',
             }
 
-            // 3. Make the token exchange request directly to the OAuth provider
+            // 4. Make the token exchange request directly to the OAuth provider
             log.info('Making token exchange request to OAuth provider:')
             log.info({
                 tokenUrl: request.tokenUrl,
@@ -82,7 +125,7 @@ export const cloudOAuth2Service = (log: FastifyBaseLogger): OAuth2Service<CloudO
                 }
             )
 
-            // 4. Log the response
+            // 5. Log the response
             log.info('Received response from OAuth provider:')
             log.info({
                 status: response.status,
@@ -90,7 +133,7 @@ export const cloudOAuth2Service = (log: FastifyBaseLogger): OAuth2Service<CloudO
                 data: response.data,
             })
 
-            // 5. Format and return the response
+            // 6. Format and return the response
             const value: CloudOAuth2ConnectionValue = {
                 ...response.data,
                 token_url: request.tokenUrl,
