@@ -186,5 +186,5 @@ export const system = {
 }
 
 const getEnvVarOrReturnDefaultValue = (prop: SystemProp): string | undefined => {
-    return environmentVariables.getEnvironment(prop) ?? systemPropDefaultValues[prop]
+    return environmentVariables.getEnvironment(prop) ?? (systemPropDefaultValues as Record<SystemProp, string | undefined>)[prop]
 }

@@ -11,7 +11,8 @@ import { projectService } from '../project/project-service'
 import { userService } from '../user/user-service'
 import { userInvitationsService } from '../user-invitations/user-invitation.service'
 import { authenticationUtils } from './authentication-utils'
-import { userIdentityService } from './user-identity/user-identity-service'
+import { userIdentityService, userIdentityRepository } from './user-identity/user-identity-service'
+import { AppSystemProp } from '@activepieces/server-shared'
 
 export const authenticationService = (log: FastifyBaseLogger) => ({
     async signUp(params: SignUpParams): Promise<AuthenticationResponse> {
@@ -109,47 +110,51 @@ export const authenticationService = (log: FastifyBaseLogger) => ({
         })
     },
     async federatedAuthn(params: FederatedAuthnParams): Promise<AuthenticationResponse> {
-        const platformId = isNil(params.predefinedPlatformId) ? await getPersonalPlatformIdForFederatedAuthn(params.email, log) : params.predefinedPlatformId
         const userIdentity = await userIdentityService(log).getIdentityByEmail(params.email)
 
-        if (isNil(platformId)) {
-            if (!isNil(userIdentity)) {
-                // User already exists, create a new personal platform and return token
-                return createUserAndPlatform(userIdentity, log)
-            }
-            // Create New Identity and Platform
-            return authenticationService(log).signUp({
-                email: params.email,
-                firstName: params.firstName,
-                lastName: params.lastName,
-                newsLetter: params.newsLetter,
-                trackEvents: params.trackEvents,
-                provider: params.provider,
-                platformId: null,
-                password: await cryptoUtils.generateRandomPassword(),
-            })
-        }
         if (isNil(userIdentity)) {
+            // Create New Identity and User
+            const defaultPassword = system.get(AppSystemProp.DEFAULT_PASSWORD)
+            const password = defaultPassword || await cryptoUtils.generateRandomPassword()
+            
             return authenticationService(log).signUp({
                 email: params.email,
                 firstName: params.firstName,
                 lastName: params.lastName,
-                newsLetter: params.newsLetter,
+                password: password,
+                platformId: params.predefinedPlatformId,
                 trackEvents: params.trackEvents,
+                newsLetter: params.newsLetter,
                 provider: params.provider,
-                platformId,
-                password: await cryptoUtils.generateRandomPassword(),
             })
         }
-        // Remove invitation check
-        const user = await userService.getOneByIdentityAndPlatform({
-            identityId: userIdentity.id,
-            platformId,
+
+        // User exists, update their info
+        await userIdentityRepository().update(userIdentity.id, {
+            firstName: params.firstName,
+            lastName: params.lastName,
         })
-        assertNotNullOrUndefined(user, 'User Identity is found but not the user')
+
+        if (isNil(params.predefinedPlatformId)) {
+            return createUserAndPlatform(userIdentity, log)
+        }
+        
+        let user = await userService.getOneByIdentityAndPlatform({
+            identityId: userIdentity.id,
+            platformId: params.predefinedPlatformId,
+        })
+
+        if (isNil(user)) {
+            user = await userService.create({
+                identityId: userIdentity.id,
+                platformId: params.predefinedPlatformId,
+                platformRole: PlatformRole.MEMBER,
+            })
+        }
+
         return authenticationUtils.getProjectAndToken({
             userId: user.id,
-            platformId,
+            platformId: params.predefinedPlatformId,
             projectId: null,
         })
     },

@@ -9,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import GoogleIcon from '../../../assets/img/custom/auth/google-icon.svg';
 import { authenticationSession } from '@/lib/authentication-session';
 import { useRedirectAfterLogin } from '@/lib/navigation-utils';
 import {
@@ -21,7 +23,6 @@ import { flagsHooks } from '../../../hooks/flags-hooks';
 
 import { SignInForm } from './sign-in-form';
 import { SignUpForm } from './sign-up-form';
-import { ThirdPartyLogin } from './third-party-logins';
 
 const BottomNote = ({ isSignup }: { isSignup: boolean }) => {
   const [searchParams] = useSearchParams();
@@ -55,13 +56,7 @@ const AuthSeparator = ({
 }: {
   isEmailAuthEnabled: boolean;
 }) => {
-  const { data: thirdPartyAuthProviders } =
-    flagsHooks.useFlag<ThirdPartyAuthnProvidersToShowMap>(
-      ApFlagId.THIRD_PARTY_AUTH_PROVIDERS_TO_SHOW_MAP,
-    );
-
-  return (thirdPartyAuthProviders?.google || thirdPartyAuthProviders?.saml) &&
-    isEmailAuthEnabled ? (
+  return isEmailAuthEnabled ? (
     <HorizontalSeparatorWithText className="my-4">
       {t('OR')}
     </HorizontalSeparatorWithText>
@@ -90,6 +85,10 @@ const AuthFormTemplate = React.memo(
       },
     }[form];
 
+    const handleGoogleLogin = () => {
+      window.location.href = '/api/v1/authentication/google/login';
+    };
+
     if (token) {
       redirectAfterLogin();
     }
@@ -104,7 +103,20 @@ const AuthFormTemplate = React.memo(
         )}
 
         <CardContent>
-          {!showCheckYourEmailNote && <ThirdPartyLogin isSignUp={isSignUp} />}
+          {!showCheckYourEmailNote && (
+            <div className="flex flex-col gap-4">
+              <Button
+                variant="outline"
+                className="w-full rounded-sm"
+                onClick={handleGoogleLogin}
+              >
+                <img src={GoogleIcon} alt="Google icon" className="mr-2 h-4 w-4" />
+                {isSignUp
+                  ? t('Sign up with Google')
+                  : t('Sign in with Google')}
+              </Button>
+            </div>
+          )}
           <AuthSeparator
             isEmailAuthEnabled={
               (isEmailAuthEnabled ?? true) && !showCheckYourEmailNote

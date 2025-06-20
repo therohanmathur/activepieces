@@ -1,4 +1,4 @@
-import { ActivepiecesError, apId, ErrorCode, isNil, UserIdentity } from '@activepieces/shared'
+import { ActivepiecesError, apId, ErrorCode, isNil, UserIdentity, UserIdentityProvider } from '@activepieces/shared'
 import { FastifyBaseLogger } from 'fastify'
 import { nanoid } from 'nanoid'
 import { repoFactory } from '../../core/db/repo-factory'
@@ -108,6 +108,16 @@ export const userIdentityService = (log: FastifyBaseLogger) => ({
             verified: true,
         })
     },
+    async updateIdentityInfo(params: UpdateIdentityInfoParams): Promise<UserIdentity> {
+        const user = await userIdentityRepository().findOneByOrFail({ id: params.id })
+        return userIdentityRepository().save({
+            ...user,
+            firstName: params.firstName,
+            lastName: params.lastName,
+            provider: params.provider,
+            updated: new Date().toISOString(),
+        })
+    },
 })
 
 
@@ -128,4 +138,11 @@ type UpdatePasswordParams = {
 type VerifyIdentityPasswordParams = {
     email: string
     password: string
+}
+
+type UpdateIdentityInfoParams = {
+    id: string
+    firstName: string
+    lastName: string
+    provider: UserIdentityProvider
 }
